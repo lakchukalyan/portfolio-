@@ -158,7 +158,7 @@
         <a href="tel:+916374134148">📱 +91 6374134148</a>
         <a href="https://www.linkedin.com/in/lakchu-kalyan-a2b422292" target="_blank">🔗 LinkedIn</a>
       </div>
-      <a class="download-btn" href="../static/Lakchukalyan_CV.pdf" download>⬇ Download CV (PDF)</a>
+      <a class="download-btn" id="downloadCv" href="../static/Lakchukalyan_CV.pdf" download>⬇ Download CV (PDF)</a>
     </div>
   </header>
 
@@ -290,5 +290,34 @@
     <p>📍 Location: Coimbatore | Prepared: November 2025</p>
     <p style="margin-top:16px"><strong>Lakchukalyan S</strong></p>
   </footer>
+  <script>
+    // Make the resume download button robust: prefer PDF, fall back to HTML, otherwise hide and show message
+    (function(){
+      const btn = document.getElementById('downloadCv');
+      if(!btn) return;
+      const pdfUrl = '../static/Lakchukalyan_CV.pdf';
+      const htmUrl = '../static/Lakchukalyan_CV.htm';
+
+      function setToPdf(){ btn.href = pdfUrl; btn.setAttribute('download','Lakchukalyan_CV.pdf'); btn.textContent = '⬇ Download CV (PDF)'; }
+      function setToHtm(){ btn.href = htmUrl; btn.removeAttribute('download'); btn.textContent = '🔍 View Resume (HTML)'; }
+      function showMissing(){ btn.style.display = 'none'; const p = document.createElement('p'); p.style.color = '#ef4444'; p.style.marginTop = '12px'; p.textContent = 'Resume file not found. Please contact via email.'; btn.parentNode.appendChild(p); }
+
+      // Try to fetch the PDF first
+      fetch(pdfUrl, { method: 'GET' }).then(r => {
+        if(r && r.ok) { setToPdf(); return; }
+        // PDF missing, try HTML
+        return fetch(htmUrl, { method: 'GET' }).then(r2 => {
+          if(r2 && r2.ok) { setToHtm(); return; }
+          showMissing();
+        }).catch(()=> showMissing());
+      }).catch(()=>{
+        // network or CORS error — try HTML
+        fetch(htmUrl, { method: 'GET' }).then(r2 => {
+          if(r2 && r2.ok) { setToHtm(); return; }
+          showMissing();
+        }).catch(()=> showMissing());
+      });
+    })();
+  </script>
 </body>
 </html>
